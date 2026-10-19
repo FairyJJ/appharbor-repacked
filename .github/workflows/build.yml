@@ -134,11 +134,12 @@ jobs:
             "" \
             "Install:" \
             '```sh' \
-            "adb install -r -t $APK" \
+            "adb install -r -t ${APK##*/}" \
             '```')
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "release $TAG exists -> re-uploading assets"
+            echo "release $TAG exists -> re-uploading assets and refreshing notes"
             gh release upload "$TAG" "$APK" dist/SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$TAG" --notes "$NOTES" --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$TAG" "$APK" dist/SHA256SUMS.txt \
               --repo "$GITHUB_REPOSITORY" \
