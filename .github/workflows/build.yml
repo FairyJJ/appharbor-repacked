@@ -115,23 +115,36 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          TAG="${{ steps.up.outputs.release_tag }}"
           APK="dist/$APP-${{ steps.up.outputs.tag }}-repacked.apk"
           mv "$(ls dist/*.apk | head -1)" "$APK"
           sha256sum "$APK" | tee dist/SHA256SUMS.txt
-          gh release create "${{ steps.up.outputs.release_tag }}" "$APK" dist/SHA256SUMS.txt \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "$APP ${{ steps.up.outputs.tag }}" \
-            --notes "$(printf '%s\n' \
-              "Upstream: $UPSTREAM @ ${{ steps.up.outputs.tag }}" \
-              "Asset: ${{ steps.up.outputs.asset_name }}" \
-              "" \
-              "Repacked for system package **$NEW_PKG** (was $OLD_PKG)." \
-              "versionCode pinned to $VERSION_CODE so the data-partition install survives reboot." \
-              "" \
-              "Install:" \
-              '```sh' \
-              "adb install -r -t $APK" \
-              '```')"
+          NOTES=$(printf '%s\n' \
+            "Upstream: $UPSTREAM @ ${{ steps.up.outputs.tag }}" \
+            "Asset: ${{ steps.up.outputs.asset_name }}" \
+            "" \
+            "Built from [BeiChen-CN/AppHarbor](https://github.com/BeiChen-CN/AppHarbor) by" \
+            "[@BeiChen-CN](https://github.com/BeiChen-CN) (fork of" \
+            "[YXBwbWFya2V0/AppMarket](https://github.com/YXBwbWFya2V0/AppMarket)). All app code and" \
+            "credit belong to the upstream author; this repo only renames the package." \
+            "No license is declared upstream — treat this artifact as personal-use only." \
+            "" \
+            "Repacked for system package **$NEW_PKG** (was $OLD_PKG)." \
+            "versionCode pinned to $VERSION_CODE so the data-partition install survives reboot." \
+            "" \
+            "Install:" \
+            '```sh' \
+            "adb install -r -t $APK" \
+            '```')
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "release $TAG exists -> re-uploading assets"
+            gh release upload "$TAG" "$APK" dist/SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "$APK" dist/SHA256SUMS.txt \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$APP ${{ steps.up.outputs.tag }}" \
+              --notes "$NOTES"
+          fi
 
       - name: Upload artifact
         if: steps.gate.outputs.build == 'true'

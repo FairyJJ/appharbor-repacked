@@ -81,3 +81,27 @@ python3 scripts/repack.py \
 ```sh
 adb shell "pm uninstall-system-updates com.xiaomi.market"
 ```
+
+## 上游与致谢
+
+| | |
+|---|---|
+| 上游项目 | [BeiChen-CN/AppHarbor](https://github.com/BeiChen-CN/AppHarbor) |
+| 上游作者 | [@BeiChen-CN](https://github.com/BeiChen-CN) |
+| 上游前身 | [YXBwbWFya2V0/AppMarket](https://github.com/YXBwbWFya2V0/AppMarket)（KMP 跨平台应用商店） |
+| 上游许可证 | **未声明**（上游仓库及其 fork 源均无 LICENSE 文件） |
+| 本仓库性质 | 非官方，仅做包名替换 + 重签名 |
+
+AppHarbor 的全部功能、界面、业务逻辑均为上游作者的成果。本仓库**不修改任何业务代码**，
+只把 `applicationId` 从 `com.app.market` 换成 `com.xiaomi.market`、抬 versionCode，
+以便顶替 HyperOS 自带的 MIUISuperMarket。原项目请见上方链接，建议优先支持上游。
+
+⚠️ **授权提示**：上游未提供开源许可证，按默认版权保留（All rights reserved）处理。
+本仓库产物仅供个人在自有设备上做系统应用替换实验，**不构成再分发授权**。
+如需向他人分发，请先联系上游作者取得许可。
+
+## 许可证
+
+- `scripts/`、`.github/` 下的构建脚本由本仓库维护者编写，可自由使用与修改。
+- APK 产物是上游作品的派生：版权与许可归 **BeiChen-CN / YXBwbWFya2V0** 所有，适用其原始条款。
+
